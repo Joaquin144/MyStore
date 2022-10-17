@@ -2,6 +2,7 @@
 
 const { findById } = require("../models/productModel");
 const Product = require("../models/productModel");
+const ErrorHandler = require("../utils/errorhandler");
 
 //Create Product    ---> [Admin Only]
 exports.createProduct = async (req,res,next) => {
@@ -26,10 +27,7 @@ exports.updateProduct = async (req,res,next)=>{
     ////console.log(`The id of prod was: ${req.params.id}`)
     let product = await Product.findById(req.params.id);
     if(!product){
-        return res.status(500).json({
-            success:false,
-            message:"Product does not exists"
-        })
+        return next(new ErrorHandler("Product does not exists",404));
     }
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
         new:true,
@@ -46,10 +44,7 @@ exports.updateProduct = async (req,res,next)=>{
 exports.deleteProduct = async (req,res,next)=>{
     const product = await Product.findById(req.params.id);
     if(!product){
-        return res.status(500).json({
-            success:false,
-            message:"Product does not exists"
-        })
+        return next(new ErrorHandler("Product does not exists",404));
     }
     await product.remove();
     res.status(200).json({
@@ -58,16 +53,12 @@ exports.deleteProduct = async (req,res,next)=>{
     });
 }
 
-//Get ProductDetail with id
+//Get ProductDetails with id
 exports.getProductDetails = async (req,res,next)=>{
     const product = await Product.findById(req.params.id);
     if(!product){
-        return res.status(500).json({
-            success:false,
-            message:"Product does not exists"
-        })
+        return next(new ErrorHandler("Product does not exists",404));
     }
-    await product.remove();
     res.status(200).json({
         success:true,
         product
