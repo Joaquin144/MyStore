@@ -2,6 +2,13 @@ const app = require('./app');
 const dotenv = require("dotenv");
 const connectDatabase = require("./config/database")
 
+//Hanlding Uncaught Exception --> eg: When we use a varibale that was not defined
+process.on("uncaughtException",(err)=>{
+    console.log(`Error: ${err.message}`);
+    console.log(`Shutting down server due to Uncaught Exception`);
+    process.exit(1);
+});
+
 //Config
 dotenv.config({ path: "backend/config/config.env" });
 
