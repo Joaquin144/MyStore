@@ -1,3 +1,7 @@
+/**
+ * This class has 2 members: query: lambda function and queryString: object[the qeury portion of URL is treated as object not String]
+ * lambda function will get mutated to apply filter/pagination/search and then be called by controller to get desired results.
+ */
 class ApiFeatures{
     constructor(query,queryStr){//query is Product.find() method and queryStr are req parameters. See previous branch for clarity.
         this.query = query;
@@ -11,7 +15,7 @@ class ApiFeatures{
                 $options:"i"//small 'i' means case-insensitive
             }
         } : {};
-        this.query = this.query.find({...keyword});
+        this.query = this.query.find({...keyword});//Product.find() = Product.find().find({...keyword})
         return this;
     }
 
@@ -32,7 +36,14 @@ class ApiFeatures{
         console.log(queryStr);
         
         //Objective: return the modified Product.find() function that could be called by ProductController
-        this.query = this.query.find(JSON.parse(queryStr));
+        this.query = this.query.find(JSON.parse(queryStr));//Product.find() = Product.find().find(JSON.parse(queryStr));
+        return this;
+    }
+
+    pagination(resultPerPage){
+        const currPage = Number(this.queryStr.page) || 1;//if page was not given in query then it will be set as 1
+        const skip = (resultPerPage)*(currPage-1);//Simple Maths Nothing special
+        this.query = this.query.limit(resultPerPage).skip(skip);//Product.find() = Product.find().limit(resultPerPage).skip(skip) --> Now don't get scared (+_+)
         return this;
     }
 }
