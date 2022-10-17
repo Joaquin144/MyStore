@@ -1,29 +1,30 @@
 //related to API stuff
 
+const catchAsyncError = require("../middleware/catchAsyncError");
 const { findById } = require("../models/productModel");
 const Product = require("../models/productModel");
 const ErrorHandler = require("../utils/errorhandler");
 
 //Create Product    ---> [Admin Only]
-exports.createProduct = async (req,res,next) => {
+exports.createProduct = catchAsyncError(async (req,res,next) => {
     const product = await Product.create(req.body);
-    res.status(200).json({
+    res.status(201).json({
         success:true,
         product
     });
-}
+});
 
 //Get All Products 
-exports.getAllProducts = async (req,res)=>{
+exports.getAllProducts = catchAsyncError(async (req,res)=>{
     const products = await Product.find();
     res.status(200).json({
         success:true,
         products
     });
-}
+});
 
 //Update Product with id  ---> [Admin Only]
-exports.updateProduct = async (req,res,next)=>{
+exports.updateProduct = catchAsyncError(async (req,res,next)=>{
     ////console.log(`The id of prod was: ${req.params.id}`)
     let product = await Product.findById(req.params.id);
     if(!product){
@@ -38,10 +39,10 @@ exports.updateProduct = async (req,res,next)=>{
         success:true,
         product
     })
-}
+});
 
 //Delete Product with id --> [Admin Only]
-exports.deleteProduct = async (req,res,next)=>{
+exports.deleteProduct = catchAsyncError(async (req,res,next)=>{
     const product = await Product.findById(req.params.id);
     if(!product){
         return next(new ErrorHandler("Product does not exists",404));
@@ -51,10 +52,10 @@ exports.deleteProduct = async (req,res,next)=>{
         success:true,
         message:"Product Deleted successfully"
     });
-}
+});
 
 //Get ProductDetails with id
-exports.getProductDetails = async (req,res,next)=>{
+exports.getProductDetails = catchAsyncError(async (req,res,next)=>{
     const product = await Product.findById(req.params.id);
     if(!product){
         return next(new ErrorHandler("Product does not exists",404));
@@ -63,4 +64,4 @@ exports.getProductDetails = async (req,res,next)=>{
         success:true,
         product
     });
-}
+});
