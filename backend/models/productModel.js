@@ -66,4 +66,4 @@ const productSchema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model("Product",productSchema);
+module.exports = mongoose.model("Product",productSchema);//similar to Android: Like we create a SQLite table from model class and use it for queries [using @Entity]
