@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -52,5 +53,19 @@ userSchema.pre("save",async function(next){
     this.password = await bcrypt.hash(this.password,10);//10 stands for power --> Powerful hashes are difficult to crack but will consume more reosurces too.
 
 })
+
+//JWT Token --> so that user does not needs to login again and again. We will store this token in cookie
+userSchema.methods.getJWTToken = function (){
+    //MongoDB automatically creates this _id field
+    return jwt.sign({id:this._id},
+        process.env.JWT_SECRET,
+        {expiresIn:process.env.JWT_EXPIRE}
+    );//Always keep JWT key a secret otherwise intruder can create any numer of fake admin accounts 😱
+}
+
+//Compare pswds
+userSchema.methods.comparePassword = async function(enteredPassword){
+    return await bcrypt.compare(enteredPassword, this.password);
+}
 
 module.exports = mongoose.model("User",userSchema);
