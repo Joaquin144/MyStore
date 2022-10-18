@@ -2,7 +2,7 @@ const express = require("express");
 const {
   registerUser,
   loginUser,
-//   logout,
+  logout,
 //   forgotPassword,
 //   resetPassword,
 //   getUserDetails,
@@ -25,7 +25,7 @@ router.route("/login").post(loginUser);
 
 // router.route("/password/reset/:token").put(resetPassword);
 
-// router.route("/logout").get(logout);
+router.route("/logout").get(logout);
 
 // router.route("/me").get(isAuthenticatedUser, getUserDetails);
 
