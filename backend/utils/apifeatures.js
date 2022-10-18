@@ -11,7 +11,7 @@ class ApiFeatures{
     search(){
         const keyword = this.queryStr.keyword ? {
             name:{
-                $regex:this.queryStr.keyword,
+                $regex:this.queryStr.keyword,//MongoDB takes a JSON object with $prefixed-parameters for querying data 
                 $options:"i"//small 'i' means case-insensitive
             }
         } : {};
@@ -19,7 +19,11 @@ class ApiFeatures{
         return this;
     }
 
+    /**
+     * Will filter the products of given category
+     */
     filter(){
+        //Don't do queryCopy = queryStr --> It creates shallow copy
         const queryCopy = {...this.queryStr}//this.queryStr is an object so it would create a shallow copy. To avoid that use spread operator[...] which creates deep copy
 
         ////console.log(queryCopy);
@@ -42,8 +46,8 @@ class ApiFeatures{
 
     pagination(resultPerPage){
         const currPage = Number(this.queryStr.page) || 1;//if page was not given in query then it will be set as 1
-        const skip = (resultPerPage)*(currPage-1);//Simple Maths Nothing special
-        this.query = this.query.limit(resultPerPage).skip(skip);//Product.find() = Product.find().limit(resultPerPage).skip(skip) --> Now don't get scared (+_+)
+        const skipResults = (resultPerPage)*(currPage-1);//Simple Maths Nothing special
+        this.query = this.query.limit(resultPerPage).skip(skipResults);//Product.find() = Product.find().limit(resultPerPage).skip(skipResults) --> Now don't get scared (+_+)
         return this;
     }
 }
