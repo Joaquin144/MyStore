@@ -8,6 +8,7 @@ const ApiFeatures = require('../utils/apifeatures');
 
 //Create Product    ---> [Admin Only]
 exports.createProduct = catchAsyncError(async (req,res,next) => {
+    req.body.user = req.user.id//We store the id of admin performing this operation and send it to MongoDB for it to automatically sotre the product creaotr's id along with product info
     const product = await Product.create(req.body);
     res.status(201).json({
         success:true,
