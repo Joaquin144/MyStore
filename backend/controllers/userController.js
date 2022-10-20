@@ -23,6 +23,7 @@ exports.registerUser = catchAsyncError( async (req,res,next)=>{
 //Login User
 exports.loginUser = catchAsyncError(async (req,res,next)=>{
     const {email,password} = req.body;
+    console.log(`email: ${email} and pass: ${password}`);
     //checking if user has given both email and pswd
     if(!email || !password){
         return next(new ErrorHandler("Please Enter both email and password",400));
@@ -92,15 +93,15 @@ exports.forgotPassword = catchAsyncError(async (req,res,next)=>{
 //Reset Password
 exports.resetPassword = catchAsyncError(async (req,res,next)=>{
     //Creating token hash
-    const resetPassword = crypto
+    const resetPasswordToken = crypto
         .createHash("sha256")
-        .update(req.params.resetToken)
+        .update(req.params.token)
         .digest("hex");
 
     const user = await User.findOne({
         resetPasswordToken,
         resetPasswordExpire:{$gt:Date.now()}
-    })
+    });
 
     if(!user){
         return next(new ErrorHandler(`Reset password token is either invalid or has expired`,400));
@@ -112,7 +113,6 @@ exports.resetPassword = catchAsyncError(async (req,res,next)=>{
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
-    console.log('lololo');
     await user.save();
 
     sendToken(user,200,res);

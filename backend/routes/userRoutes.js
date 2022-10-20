@@ -23,7 +23,7 @@ router.route("/login").post(loginUser);
 
 router.route("/password/forgot").post(forgotPassword);
 
-router.route("/password/reset/:token").put(resetPassword);
+router.route("/password/reset/:token").put(resetPassword);//Because we are updating field ao this is not POST but a PUT request
 
 router.route("/logout").get(logout);
 
