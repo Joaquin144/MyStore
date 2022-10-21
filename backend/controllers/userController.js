@@ -67,7 +67,7 @@ exports.forgotPassword = catchAsyncError(async (req,res,next)=>{
     //get reset password token
     const resetToken = user.getResetPasswordToken();
     await user.save({validateBeforeSave:false});
-    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/password/reset/${resetToken}`;
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`;
 
     const message = `This is for testing purposes. Jisko mile woh IGNORE kar dena.\n\nYour password reset token is:--- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then please ignore it.\n\n`;
     
@@ -116,4 +116,125 @@ exports.resetPassword = catchAsyncError(async (req,res,next)=>{
     await user.save();
 
     sendToken(user,200,res);
+});
+
+//Get User Details
+exports.getUserDetails = catchAsyncError(async (req,res,next)=>{
+    const user = await User.findById(req.user.id);//Since on logging in whole user is saved in req so we can access the id alng with other parameters. --> See auth.js for more details
+
+    res.status(200).json({
+        success:true,
+        user
+    });
+    
+});
+
+//Update User Password
+exports.updatePassword = catchAsyncError(async (req,res,next)=>{
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPasswordMatched =await user.comparePassword(req.body.oldPassword);
+    if(!isPasswordMatched){
+        return next(new ErrorHandler("Old Password is wrong",400));
+    }
+
+    if(req.body.newPassword != req.body.confirmPassword){
+        return next(new ErrorHandler("New Password doesn't matches with old one",400));
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendToken(user,200,res);
+    
+});
+
+//Update User Profile
+exports.updateProfile = catchAsyncError(async (req,res,next)=>{
+    const newUserData={
+        name:req.body.name,
+        email:req.body.email
+    }
+
+    //todo:Provie option to upload avatar(=profile pic)
+
+    const user = await User.findByIdAndUpdate(req.user.id,newUserData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:false
+    });
+
+    res.status(200).json({
+        success:true
+    })
+    
+});
+
+
+//Get all users (Admin only)
+exports.getAllUsers = catchAsyncError(async (req,res,next)=>{
+    const users = await User.find();
+    res.status(200).json({
+        success:true,
+        users
+    });
+});
+
+
+//Get User Detail (Admin only)
+exports.getSingleUser = catchAsyncError(async (req,res,next)=>{
+    const user = await User.findById(req.params.id);
+    if(!user){
+        return next(new ErrorHandler(`User with id: ${req.params.id} is not found`),400);
+    }
+
+    res.status(200).json({
+        success:true,
+        user
+    });
+});
+
+
+//Update User Role --> Admin Only
+exports.updateUserRole = catchAsyncError(async (req,res,next)=>{
+    const user1 = await User.findById(req.params.id);
+    if(!user1){
+        return next(new ErrorHandler(`User with id: ${req.params.id} is not found`),400);
+    }
+
+    const newUserData={
+        name:req.body.name,
+        email:req.body.email,
+        role:req.body.role
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id,newUserData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:false
+    });
+
+    res.status(200).json({
+        success:true,
+        user
+    });
+});
+
+
+//Delete User --> Admin Only
+exports.deleteUser = catchAsyncError(async (req,res,next)=>{
+
+    const user = await User.findById(req.params.id);
+    if(!user){
+        return next(new ErrorHandler(`User with id: ${req.params.id} is not found`),400);
+    }
+
+    //todo: Delete hosted Proifle Pic of this user too so that it doesn't consumes space and thus expenses
+
+    await user.remove();
+
+    res.status(200).json({
+        success:true,
+        message:"User Deleted Successfully"
+    });
 });
