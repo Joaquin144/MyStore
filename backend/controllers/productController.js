@@ -17,21 +17,30 @@ exports.createProduct = catchAsyncError(async (req,res,next) => {
 });
 
 //Get All Products 
-exports.getAllProducts = catchAsyncError(async (req,res)=>{
-    const resultPerPage = 10;
-    const productCount = await Product.countDocuments();
-
-    const apiFeature = new ApiFeatures(Product.find(),req.query)
-        .search()
-        .filter()
-        .pagination(resultPerPage);
-    const products = await apiFeature.query;
+exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
+    const resultPerPage = 8;
+    const productsCount = await Product.countDocuments();
+  
+    const apiFeature = new ApiFeatures(Product.find(), req.query)
+      .search()
+      .filter();
+  
+    let products = await apiFeature.query;
+  
+    let filteredProductsCount = products.length;
+  
+    apiFeature.pagination(resultPerPage);
+  
+    products = await apiFeature.query;
+  
     res.status(200).json({
-        success:true,
-        count:productCount,
-        products
+      success: true,
+      products,
+      productsCount,
+      resultPerPage,
+      filteredProductsCount,
     });
-});
+  });
 
 //Update Product with id  ---> [Admin Only]
 exports.updateProduct = catchAsyncError(async (req,res,next)=>{
