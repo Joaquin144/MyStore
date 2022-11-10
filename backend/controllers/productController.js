@@ -16,22 +16,38 @@ exports.createProduct = catchAsyncError(async (req,res,next) => {
     });
 });
 
-//Get All Products 
+//Get All Products
+// exports.getAllProducts = catchAsyncError(async (req,res)=>{
+//     const resultPerPage = 10;
+//     const productsCount = await Product.countDocuments();
+
+//     const apiFeature = new ApiFeatures(Product.find(),req.query)
+//         .search()
+//         .filter()
+//         .pagination(resultPerPage);
+//     const products = await apiFeature.query;
+//     res.status(200).json({
+//         success:true,
+//         productsCount:productsCount,
+//         products
+//     });
+// });
 exports.getAllProducts = catchAsyncError(async (req, res, next) => {
     const resultPerPage = 8;
     const productsCount = await Product.countDocuments();
   
     const apiFeature = new ApiFeatures(Product.find(), req.query)
       .search()
-      .filter();
+      .filter()
+      .pagination(resultPerPage);
   
     let products = await apiFeature.query;
   
     let filteredProductsCount = products.length;
   
-    apiFeature.pagination(resultPerPage);
+    //apiFeature.pagination(resultPerPage);
   
-    products = await apiFeature.query;
+    //products = await apiFeature.query;
   
     res.status(200).json({
       success: true,
