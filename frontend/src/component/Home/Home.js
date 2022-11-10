@@ -6,11 +6,12 @@ import MetaData from "../layout/MetaData";
 import { clearErrors, getProduct } from "../../actions/productActions";
 import { useSelector, useDispatch } from "react-redux";
 import { useAlert } from "react-alert";
+import Loader from '../layout/Loader/Loader';
 //import ProductCard from './ProductCard';
 
 
 const Home = () => {
-  //const alert = useAlert();
+  const alert = useAlert();
   const dispatch = useDispatch();
   const { loading, error, products } = useSelector((state) => state.products);
 
@@ -24,27 +25,33 @@ const Home = () => {
 
   return (
     <Fragment>
-      <MetaData title="MyStore" />
-      <div className="banner">
-        <p>Welcome to MyStore</p>
-        <h1>Find Amazing products offered at cheap prices</h1>
-        <a href="#container">
-          <button>
-            Scroll <CgMouse />
-          </button>
-        </a>
-      </div>
+      {loading ? (
+        <Loader />
+      ) : (
+        <Fragment>
+          <MetaData title="MyStore" />
 
-      <h2 className="homeHeading">Featured Products</h2>
+          <div className="banner">
+            <p>Welcome to MyStore</p>
+            <h1>FIND AMAZING PRODUCTS BELOW</h1>
 
-      {console.log(`products are ${products}`)}
-      <div className="container" id="container">
-        {products &&
-          products.map((product) => (
-            //<Product product={product} />
-            console.log(product)
-          ))}
-      </div>
+            <a href="#container">
+              <button>
+                Scroll <CgMouse />
+              </button>
+            </a>
+          </div>
+
+          <h2 className="homeHeading">Featured Products</h2>
+
+          <div className="container" id="container">
+            {products &&
+              products.map((product) => (
+                <Product key={product._id} product={product} />
+              ))}
+          </div>
+        </Fragment>
+      )}
     </Fragment>
   );
 };
